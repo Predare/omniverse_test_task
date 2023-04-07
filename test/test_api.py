@@ -5,6 +5,7 @@ import utils
 
 BASE_URL = 'https://testers-task.omniversegames.ru/'
 
+
 class TestLogin:
     url = ''.join((BASE_URL, 'login'))
 
@@ -127,11 +128,11 @@ class TestEndBattle:
         headers = {'Authorization': 'Bearer {0}'.format(json_web_token)}
         uuid1 = {'is_won': str(True).lower()}
         uuid2 = {'is_won': str(False).lower()}
-        users = { start_battle['uuid1']: uuid1, start_battle['uuid2']: uuid2}
+        users = {start_battle['uuid1']: uuid1, start_battle['uuid2']: uuid2}
         body = {
-            'battle_id': start_battle['battle_id'], 
+            'battle_id': start_battle['battle_id'],
             'results': users}
-        
+
         response = requests.post(self.url, headers=headers, json=body)
         assert response.status_code == requests.codes.ok
         assert response.headers.get('content-type') == 'application/json'
@@ -144,7 +145,7 @@ class TestEndBattle:
         assert uuid.UUID(battle['id'])
         assert utils.is_date(battle['started_at'])
         assert utils.is_date(battle['ended_at'])
-        
+
         userList = list(users)
         assert battle['winner'] == userList[0]
         assert battle['users'] == userList
@@ -170,22 +171,22 @@ class TestEndBattle:
         headers = {'Authorization': 'Bearer {0}'.format(json_web_token)}
         uuid1 = {'is_won': str(True).lower()}
         uuid2 = {'is_won': str(False).lower()}
-        users = { start_battle['uuid1']: uuid1, start_battle['uuid2']: uuid2}
+        users = {start_battle['uuid1']: uuid1, start_battle['uuid2']: uuid2}
         body = {
-            'battle_id': start_battle['battle_id'], 
+            'battle_id': start_battle['battle_id'],
             'results': users}
-        
+
         response = method(self.url, headers=headers, json=body)
         assert response.status_code == requests.codes.not_allowed
 
     def test_unauthorized_request(self, start_battle):
         uuid1 = {'is_won': str(True).lower()}
         uuid2 = {'is_won': str(False).lower()}
-        users = { start_battle['uuid1']: uuid1, start_battle['uuid2']: uuid2}
+        users = {start_battle['uuid1']: uuid1, start_battle['uuid2']: uuid2}
         body = {
-            'battle_id': start_battle['battle_id'], 
+            'battle_id': start_battle['battle_id'],
             'results': users}
-        
+
         response = requests.post(self.url, json=body)
         assert response.status_code == requests.codes.forbidden
 
@@ -193,10 +194,10 @@ class TestEndBattle:
         headers = {'Authorization': 'Bearer 1231231233'}
         uuid1 = {'is_won': str(True).lower()}
         uuid2 = {'is_won': str(False).lower()}
-        users = { start_battle['uuid1']: uuid1, start_battle['uuid2']: uuid2}
+        users = {start_battle['uuid1']: uuid1, start_battle['uuid2']: uuid2}
         body = {
-            'battle_id': start_battle['battle_id'], 
+            'battle_id': start_battle['battle_id'],
             'results': users}
-        
+
         response = requests.post(self.url, headers=headers, json=body)
         assert response.status_code == requests.codes.unauthorized

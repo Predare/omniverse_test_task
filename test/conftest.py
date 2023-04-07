@@ -2,6 +2,7 @@ import pytest
 import requests
 import uuid
 
+
 @pytest.fixture(scope="function")
 def json_web_token():
     url = 'https://testers-task.omniversegames.ru/login'
@@ -9,6 +10,7 @@ def json_web_token():
     response = requests.post(url, json=body)
     responseJson = response.json()
     return responseJson['access_token']
+
 
 @pytest.fixture(scope="function")
 def start_battle(json_web_token):
@@ -19,9 +21,9 @@ def start_battle(json_web_token):
 
     response = requests.post(url, json=body, headers=headers)
     responseJson = response.json()
-    
+
     return {
-        'uuid1': usersUUID[0], 
-        'uuid2': usersUUID[1], 
+        'uuid1': usersUUID[0],
+        'uuid2': usersUUID[1],
         'battle_id': responseJson['battle_id']
-        }
+    }
