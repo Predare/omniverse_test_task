@@ -27,3 +27,25 @@ def start_battle(json_web_token):
         'uuid2': usersUUID[1],
         'battle_id': responseJson['battle_id']
     }
+
+
+@pytest.fixture(scope="function", params=[lambda url, headers, json:
+                                          requests.delete(
+                                              url, headers=headers),
+                                          lambda url, headers, json:
+                                          requests.options(
+                                              url, headers=headers),
+                                          lambda url, headers, json:
+                                          requests.head(url, headers=headers),
+                                          lambda url, headers, json:
+                                          requests.put(
+                                              url, headers=headers, json=json),
+                                          lambda url, headers, json:
+                                          requests.patch(
+                                              url, headers=headers, json=json),
+                                          lambda url, headers, json:
+                                          requests.get(
+                                              url, headers=headers, json=json),
+                                          ])
+def http_method(request):
+    return request.param

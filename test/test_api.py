@@ -35,17 +35,9 @@ class TestLogin:
         response = requests.post(self.url, json=body)
         assert response.status_code == requests.codes.unauthorized
 
-    @pytest.mark.parametrize("method",
-                             [lambda url, json: requests.delete(url),
-                              lambda url, json: requests.options(url),
-                              lambda url, json: requests.head(url),
-                              lambda url, json: requests.put(url, json),
-                              lambda url, json: requests.patch(url, json),
-                              lambda url, json: requests.get(url, json),
-                              ])
-    def test_wrong_method_scenario(self, method):
+    def test_forbidden_methods(self, http_method):
         body = {'username': 'example_user', 'password': 'example_password'}
-        response = method(self.url, body)
+        response = http_method(url=self.url, headers={}, json=body)
         assert response.status_code == requests.codes.not_allowed
 
 
@@ -87,29 +79,12 @@ class TestStartBattle:
         response = requests.post(self.url, json=body)
         assert response.status_code == requests.codes.forbidden
 
-    @pytest.mark.parametrize("method",
-                             [lambda url, headers, json:
-                              requests.delete(url, headers=headers),
-                              lambda url, headers, json:
-                                  requests.options(url, headers=headers),
-                              lambda url, headers, json:
-                                  requests.head(url, headers=headers),
-                              lambda url, headers, json:
-                                  requests.put(
-                                      url, headers=headers, json=json),
-                              lambda url, headers, json:
-                                  requests.patch(
-                                      url, headers=headers, json=json),
-                              lambda url, headers, json:
-                                  requests.get(
-                                      url, headers=headers, json=json),
-                              ])
-    def test_forbidden_methods(self, json_web_token, method):
+    def test_forbidden_methods(self, json_web_token, http_method):
         usersUUID = [str(uuid.uuid4()), str(uuid.uuid4())]
         headers = {'Authorization': 'Bearer {0}'.format(json_web_token)}
         body = {'users': usersUUID}
 
-        response = method(self.url, headers=headers, json=body)
+        response = http_method(url=self.url, headers=headers, json=body)
         assert response.status_code == requests.codes.not_allowed
 
     def test_wrong_jwt(self):
@@ -150,24 +125,7 @@ class TestEndBattle:
         assert battle['winner'] == userList[0]
         assert battle['users'] == userList
 
-    @pytest.mark.parametrize("method",
-                             [lambda url, headers, json:
-                              requests.delete(url, headers=headers),
-                              lambda url, headers, json:
-                                  requests.options(url, headers=headers),
-                              lambda url, headers, json:
-                                  requests.head(url, headers=headers),
-                              lambda url, headers, json:
-                                  requests.put(
-                                      url, headers=headers, json=json),
-                              lambda url, headers, json:
-                                  requests.patch(
-                                      url, headers=headers, json=json),
-                              lambda url, headers, json:
-                                  requests.get(
-                                      url, headers=headers, json=json),
-                              ])
-    def test_forbidden_methods(self, json_web_token, method, start_battle):
+    def test_forbidden_methods(self, json_web_token, http_method, start_battle):
         headers = {'Authorization': 'Bearer {0}'.format(json_web_token)}
         uuid1 = {'is_won': str(True).lower()}
         uuid2 = {'is_won': str(False).lower()}
@@ -176,7 +134,7 @@ class TestEndBattle:
             'battle_id': start_battle['battle_id'],
             'results': users}
 
-        response = method(self.url, headers=headers, json=body)
+        response = http_method(url=self.url, headers=headers, json=body)
         assert response.status_code == requests.codes.not_allowed
 
     def test_unauthorized_request(self, start_battle):
