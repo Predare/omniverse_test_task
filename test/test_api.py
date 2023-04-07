@@ -125,6 +125,42 @@ class TestEndBattle:
         assert battle['winner'] == userList[0]
         assert battle['users'] == userList
 
+    def test_wrong_uuid_scenario(self, json_web_token, start_battle):
+        headers = {'Authorization': 'Bearer {0}'.format(json_web_token)}
+        uuid1 = {'is_won': str(True).lower()}
+        uuid2 = {'is_won': str(False).lower()}
+        users = {'dsfsdf': uuid1, start_battle['uuid2']: uuid2}
+        body = {
+            'battle_id': start_battle['battle_id'],
+            'results': users}
+
+        response = requests.post(self.url, headers=headers, json=body)
+        assert response.status_code == requests.codes.unprocessable_entity
+
+    def test_wrong_user_data_scenario(self, json_web_token, start_battle):
+        headers = {'Authorization': 'Bearer {0}'.format(json_web_token)}
+        uuid1 = {'is_won': 'Wrong data'}
+        uuid2 = {'is_won': str(False).lower()}
+        users = {start_battle['uuid1']: uuid1, 'fdfds': uuid2}
+        body = {
+            'battle_id': start_battle['battle_id'],
+            'results': users}
+
+        response = requests.post(self.url, headers=headers, json=body)
+        assert response.status_code == requests.codes.unprocessable_entity
+
+    def test_wrong_battle_id_scenario(self, json_web_token, start_battle):
+        headers = {'Authorization': 'Bearer {0}'.format(json_web_token)}
+        uuid1 = {'is_won': str(True).lower()}
+        uuid2 = {'is_won': str(False).lower()}
+        users = {start_battle['uuid1']: uuid1, 'fdfds': uuid2}
+        body = {
+            'battle_id': 'sdfsfd',
+            'results': users}
+
+        response = requests.post(self.url, headers=headers, json=body)
+        assert response.status_code == requests.codes.unprocessable_entity
+
     def test_forbidden_methods(self, json_web_token, http_method, start_battle):
         headers = {'Authorization': 'Bearer {0}'.format(json_web_token)}
         uuid1 = {'is_won': str(True).lower()}
